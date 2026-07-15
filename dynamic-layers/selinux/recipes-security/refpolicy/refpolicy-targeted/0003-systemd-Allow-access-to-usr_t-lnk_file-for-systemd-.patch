@@ -1,0 +1,32 @@
+From: QLI Orchestrator <qli-orchestrator@qualcomm.com>
+Subject: systemd: Allow access to usr_t lnk_file for systemd services
+
+On Yocto-based Qualcomm Linux images, /usr/local is a symlink (lnk_file)
+labelled usr_t. Multiple systemd services (systemd-modules-load,
+systemd-sysctl, systemd-tmpfiles, systemd-sysusers) traverse this symlink
+during early boot.
+
+Grant minimal lnk_file {getattr read} permissions to the affected systemd
+domains for usr_t objects.
+
+Upstream-Status: Pending
+
+Signed-off-by: QLI Orchestrator <qli-orchestrator@qualcomm.com>
+
+diff --git a/policy/modules/system/systemd.te b/policy/modules/system/systemd.te
+--- a/policy/modules/system/systemd.te
++++ b/policy/modules/system/systemd.te
+@@ -1444,6 +1444,13 @@ modutils_read_module_deps(systemd_modules_load_t)
+ 
+ systemd_log_parse_environment(systemd_modules_load_t)
+ 
++# Allow systemd services to traverse /usr/local symlink (usr_t lnk_file)
++# Required on Yocto images where /usr/local is a symlink
++allow systemd_modules_load_t usr_t:lnk_file { getattr read };
++allow systemd_sysctl_t usr_t:lnk_file { getattr read };
++allow systemd_tmpfiles_t usr_t:lnk_file { getattr read };
++allow systemd_sysusers_t usr_t:lnk_file { getattr read };
++
+ ########################################
+ #
+ # networkd local policy
