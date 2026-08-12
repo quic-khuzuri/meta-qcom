@@ -1,0 +1,3 @@
+# CI/CD Orchestrator Test — selinux-ufs-policy
+# This file is auto-generated for pipeline testing.
+# Distro-role PR — no Orch-* trailer required.
